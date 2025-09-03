@@ -12,7 +12,6 @@ public static class InfrastructureService
 {
     public static IServiceCollection AddInfrastructureService(this IServiceCollection services, IConfiguration config)
     {
-        // Add shared services (DbContext, Serilog, etc.)
         Service.AddSharedServices<AppDbContext>(services, config, config["MySerilog:FileName"]!);
 
         // Identity for Appuser
@@ -29,6 +28,10 @@ public static class InfrastructureService
         // Repositories + Token service
         services.AddScoped<IUsers, UserRepository>();
         services.AddScoped<IToken, TokenService>();
+
+        // ✅ JWT auth setup
+        services.AddJwtAuthentication(config);
+
 
         return services;
     }

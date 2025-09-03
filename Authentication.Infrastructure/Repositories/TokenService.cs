@@ -18,45 +18,48 @@ namespace Authentication.Infrastructure.Data.Repositories
         {
             _config = config;
             _userManager = userManager;
-            // Create the security key once and reuse it
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+
+            // Correct section -> "Authentication:Key"
+            _key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Authentication:Key"]!)
+            );
         }
 
         public async Task<string> CreateAccessTokenAsync(Appuser user)
         {
-            // 1. Get the user's roles from the UserManager
+            // 1. Get the user's roles
             var roles = await _userManager.GetRolesAsync(user);
 
-            // 2. Create the list of claims to be included in the token
+            // 2. Create claims
             var claims = new List<Claim>
             {
-                // Standard claims (pre-defined names)
-                new Claim(JwtRegisteredClaimNames.NameId, user.Id), // The user's unique ID
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Name, user.UserName ?? string.Empty),
 
-                // Custom claims (you can name them whatever you want)
-                new Claim("fullName", user.Fullname),
-                new Claim("address", user.Address)
+                // Custom claims
+                new Claim("fullName", user.Fullname ?? string.Empty),
+                new Claim("address", user.Address ?? string.Empty)
             };
 
-            // Add all the user's roles to the claims
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            // 3. Create signing credentials with a secure algorithm
+            // 3. Signing credentials
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
-            // 4. Describe the token's properties (claims, expiry, etc.)
+            // 4. Token descriptor
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddDays(7), // Token will be valid for 7 days
+                Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = creds,
-                Issuer = _config["Jwt:Issuer"],
-                Audience = _config["Jwt:Audience"]
+
+                // Correct sections -> "Authentication:Issuer" & "Authentication:Audience"
+                Issuer = _config["Authentication:Issuer"],
+                Audience = _config["Authentication:Audience"]
             };
 
-            // 5. Create the token handler and generate the token string
+            // 5. Generate token
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
