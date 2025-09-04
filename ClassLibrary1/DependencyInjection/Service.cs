@@ -37,7 +37,7 @@ namespace SharedLibrary.DependencyInjection
         public static IApplicationBuilder AddSharedPolicy(this IApplicationBuilder app)
         {
             app.UseMiddleware<GlobalExceptions>();
-            app.UseMiddleware<ListenToApiGateway>();
+            //app.UseMiddleware<ListenToApiGateway>();
 
             return app;
         }
