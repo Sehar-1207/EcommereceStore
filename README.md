@@ -22,7 +22,6 @@
 - [Contributing](#-contributing)
 - [License](#-license)
 
----
 
 ## 🌟 Overview
 
@@ -86,7 +85,7 @@ The Shared Library (`ClassLibrary1`) ensures consistency across all services.
 | **AutoMapper** | Object Mapping | Reduces boilerplate code by automating the conversion between Entities and DTOs. |
 | **ASP.NET Core Identity** | Identity Management | A proven framework for handling user accounts, passwords, and roles. |
 
----
+```
 
 ## 📁 Project Structure
 
@@ -126,9 +125,7 @@ Commerce/
     ├── 📂 Middleware/                  # GlobalExceptions and Gateway listener
     └── 📂 Resonse/                     # Standardized ApiResponse model
 ```
-
----
-
+```
 ## 🚀 Getting Started
 
 ### Prerequisites
